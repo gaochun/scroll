@@ -1,0 +1,28 @@
+{
+  "name": "cordova-plugin-image-thumbnail",
+  "version": "1.2.0",
+  "description": "Cordova Image Thumbnail Plugin",
+  "cordova": {
+    "platforms": [
+      "android"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gaochun/cordova-plugin-image-thumbnail"
+  },
+  "keywords": [
+    "cordova",
+    "image",
+    "thumbnail",
+    "cordova-android"
+  ],
+  "engines": [
+    {
+      "name": "cordova-android",
+      "version": ">=4.0.0-dev"
+    }
+  ],
+  "author": "Gao Chun",
+  "license": "Apache 2.0"
+}
