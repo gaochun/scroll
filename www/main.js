@@ -1,37 +1,4 @@
-// $(function(){
-//   //var path = "file:///mnt/sdcard/test_pictures/";
-//   var path = "images/"
-//
-//   for (var i = 1; i <= 100; i++) {
-//     $('<img>').attr('src', path + 'beautifulgirlA (' + i + ').jpg').css('width', '33%').appendTo($('body'));
-//   }
-//
-//   for (var i = 1; i <= 100; i++) {
-//     $('<img>').attr('src', path + 'beautifulgirlB (' + i + ').jpg').css('width', '33%').appendTo($('body'));
-//   }
-//
-//   for (var i = 1; i <= 96; i++) {
-//     $('<img>').attr('src', path + 'beautifulgirlC (' + i + ').jpg').css('width', '33%').appendTo($('body'));
-//   }
-//
-//   for (var i = 1; i <= 100; i++) {
-//     $('<img>').attr('src', path + 'beautifulgirlD (' + i + ').jpg').css('width', '33%').appendTo($('body'));
-//   }
-//
-//   for (var i = 1; i <= 100; i++) {
-//     $('<img>').attr('src', path + 'beautifulgirlE (' + i + ').jpg').css('width', '33%').appendTo($('body'));
-//   }
-//
-//   for (var i = 1; i <= 100; i++) {
-//     $('<img>').attr('src', path + 'beautifulgirlF (' + i + ').jpg').css('width', '33%').appendTo($('body'));
-//   }
-//
-//   for (var i = 1; i <= 75; i++) {
-//     $('<img>').attr('src', path + 'beautifulgirlG (' + i + ').jpg').css('width', '33%').appendTo($('body'));
-//   }
-//
-// });
-
+var db = null;
 
 var app = {
     // Application Constructor
@@ -54,7 +21,20 @@ var app = {
     },
     // Update DOM on a Received Event
     receivedEvent: function(id) {
-        setTimeout(init, 200);
+      var request = indexedDB.open("library", 1);
+
+      request.onupgradeneeded = function(event) {
+        var db = request.result;
+        if (event.oldVersion < 1) {
+          var store = db.createObjectStore("thumbnail", {keyPath: "name"});
+          var imageIndex = store.createIndex("by_image", "image");
+        }
+      };
+
+      request.onsuccess = function() {
+        db = request.result;
+        init();
+      };
     }
 };
 
@@ -62,53 +42,71 @@ app.initialize();
 
 
 function init() {
-  // window.thumbnail("/storage/emulated/0/test.jpg", function(result) {
-  //   $('<img>').attr('src', 'data:image/png;base64,'+result).css('width', '33%').appendTo($('body'));
-  // });
-
-  //var path = "file:///mnt/sdcard/test_pictures/";
   var path = "/storage/emulated/0/test_pictures/images/"
+  var index = 0;
+  var width = screen.width / 3;
+  window.setThumbnailSize(width);
+
+  var file_names = [];
 
   for (var i = 1; i <= 100; i++) {
-    //$('<img>').attr('src', path + 'beautifulgirlA (' + i + ').jpg').css('width', '33%').appendTo($('body'));
-    window.thumbnail(path + 'beautifulgirlA (' + i + ').jpg', function(result) {
-      $('<img>').attr('src', 'data:image/png;base64,'+result).css('width', '33%').appendTo($('body'));
-    });
+    file_names.push('beautifulgirlA (' + i + ').jpg');
+    $('<img>').css('width', width + 'px').css('height', width + 'px').appendTo($('body'));
   }
 
   for (var i = 1; i <= 100; i++) {
-    window.thumbnail(path + 'beautifulgirlB (' + i + ').jpg', function(result) {
-      $('<img>').attr('src', 'data:image/png;base64,'+result).css('width', '33%').appendTo($('body'));
-    });
+    file_names.push('beautifulgirlB (' + i + ').jpg');
+    $('<img>').css('width', width + 'px').css('height', width + 'px').appendTo($('body'));
   }
 
   for (var i = 1; i <= 96; i++) {
-    window.thumbnail(path + 'beautifulgirlB (' + i + ').jpg', function(result) {
-      $('<img>').attr('src', 'data:image/png;base64,'+result).css('width', '33%').appendTo($('body'));
-    });
+    file_names.push('beautifulgirlC (' + i + ').jpg');
+    $('<img>').css('width', width + 'px').css('height', width + 'px').appendTo($('body'));
   }
 
-//  for (var i = 1; i <= 100; i++) {
-//    window.thumbnail(path + 'beautifulgirlC (' + i + ').jpg', function(result) {
-//      $('<img>').attr('src', 'data:image/png;base64,'+result).css('width', '33%').appendTo($('body'));
-//    });
-//  }
-//
-//  for (var i = 1; i <= 100; i++) {
-//    window.thumbnail(path + 'beautifulgirlD (' + i + ').jpg', function(result) {
-//      $('<img>').attr('src', 'data:image/png;base64,'+result).css('width', '33%').appendTo($('body'));
-//    });
-//  }
-//
-//  for (var i = 1; i <= 100; i++) {
-//    window.thumbnail(path + 'beautifulgirlE (' + i + ').jpg', function(result) {
-//      $('<img>').attr('src', 'data:image/png;base64,'+result).css('width', '33%').appendTo($('body'));
-//    });
-//  }
-//
-//  for (var i = 1; i <= 75; i++) {
-//    window.thumbnail(path + 'beautifulgirlF (' + i + ').jpg', function(result) {
-//      $('<img>').attr('src', 'data:image/png;base64,'+result).css('width', '33%').appendTo($('body'));
-//    });
-//  }
+  for (var i = 1; i <= 100; i++) {
+    file_names.push('beautifulgirlD (' + i + ').jpg');
+    $('<img>').css('width', width + 'px').css('height', width + 'px').appendTo($('body'));
+  }
+
+  for (var i = 1; i <= 100; i++) {
+    file_names.push('beautifulgirlE (' + i + ').jpg');
+    $('<img>').css('width', width + 'px').css('height', width + 'px').appendTo($('body'));
+  }
+
+  for (var i = 1; i <= 75; i++) {
+    file_names.push('beautifulgirlF (' + i + ').jpg');
+    $('<img>').css('width', width + 'px').css('height', width + 'px').appendTo($('body'));
+  }
+
+  file_names.reduce(function(sequence, file_name) {
+    return sequence.then(function() {
+      return new Promise(function(resolve, reject) {
+        var tx = db.transaction("thumbnail", "readwrite");
+        var store = tx.objectStore("thumbnail");
+        var request = store.get(file_name);
+        request.onsuccess = function() {
+          var matching = request.result;
+          if (matching !== undefined) {
+            resolve(matching.image);
+          } else {
+            reject();
+          }
+        };
+      }).then(function(result) {
+        $('img').eq(index++).attr('src', 'data:image/png;base64,'+result);
+      }).catch(function() {
+        return new Promise(function(resolve, reject) {
+          window.getThumbnail(path + file_name, function(result) {
+            resolve(result);
+          });
+        }).then(function(result) {
+          $('img').eq(index++).attr('src', 'data:image/png;base64,'+result);
+          var tx = db.transaction("thumbnail", "readwrite");
+          var store = tx.objectStore("thumbnail");
+          var request = store.put({name: file_name, image: result});
+        });
+      });
+    });
+  }, Promise.resolve());
 }
