@@ -28,17 +28,24 @@ import java.io.FileNotFoundException;
  */
 public class ThumbnailPlugin extends CordovaPlugin {
 
+    private int width = 200;
+    private int height = 200;
+
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
-        if (action.equals("thumbnail")) {
+        if (action.equals("getThumbnail")) {
             String message = args.getString(0);
-            this.thumbnail(message, callbackContext);
+            this.getThumbnail(message, callbackContext);
+            return true;
+        } else if (action.equals("setThumbnailSize")) {
+            int size = args.getInt(0);
+            width = height = size;
             return true;
         }
         return false;
     }
 
-    private void thumbnail(final String path, final CallbackContext callbackContext) {
+    private void getThumbnail(final String path, final CallbackContext callbackContext) {
         cordova.getThreadPool().execute(new Runnable() {
             @Override
             public void run() {
@@ -46,19 +53,16 @@ public class ThumbnailPlugin extends CordovaPlugin {
                     callbackContext.error(path + " is invalid path.");
                     return;
                 }
-                int width = 200;
-                int height = 200;
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inJustDecodeBounds = true;
+
                 Bitmap bitmap = null;
-                BitmapFactory.Options options = null;
                 try {
-                    options = new BitmapFactory.Options();
+                    bitmap = BitmapFactory.decodeFile(path, options);
                 } catch (Exception exception) {
                     callbackContext.error("Load " + path + " failed.");
                     return;
                 }
-                options.inJustDecodeBounds = true;
-                // 获取这个图片的宽和高，注意此处的bitmap为null
-                bitmap = BitmapFactory.decodeFile(path, options);
                 options.inJustDecodeBounds = false; // 设为 false
                 // 计算缩放比
                 int h = options.outHeight;
@@ -81,10 +85,14 @@ public class ThumbnailPlugin extends CordovaPlugin {
                 bitmap = ThumbnailUtils.extractThumbnail(bitmap, width, height,
                         ThumbnailUtils.OPTIONS_RECYCLE_INPUT);
 
+                String result = "";
                 ByteArrayOutputStream bStream = new ByteArrayOutputStream();
-                bitmap.compress(Bitmap.CompressFormat.PNG, 5, bStream);
-                byte[] bytes = bStream.toByteArray();
-                String result = Base64.encodeToString(bytes, Base64.DEFAULT);
+                try {
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 5, bStream);
+                    byte[] bytes = bStream.toByteArray();
+                    result = Base64.encodeToString(bytes, Base64.DEFAULT);
+                } catch (Exception e) {
+                }
 
                 callbackContext.success(result);
             }

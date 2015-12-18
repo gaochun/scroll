@@ -18,8 +18,14 @@
  *
 */
 
-window.thumbnail = function(str, callback) {
+window.getThumbnail = function(str, callback) {
     cordova.exec(callback, function(err) {
         callback('Get thumbnail failed.');
-    }, "Thumbnail", "thumbnail", [str]);
+    }, "Thumbnail", "getThumbnail", [str]);
+};
+
+window.setThumbnailSize = function(str, callback) {
+    cordova.exec(callback, function(err) {
+        callback('Set thumbnail size failed.');
+    }, "Thumbnail", "setThumbnailSize", [str]);
 };
