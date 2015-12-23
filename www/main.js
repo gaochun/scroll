@@ -51,62 +51,83 @@ function init() {
 
   for (var i = 1; i <= 100; i++) {
     file_names.push('beautifulgirlA (' + i + ').jpg');
-    $('<img>').css('width', width + 'px').css('height', width + 'px').appendTo($('body'));
+    //$('<img>').css('width', width + 'px').css('height', width + 'px').appendTo($('body'));
   }
 
-  for (var i = 1; i <= 100; i++) {
-    file_names.push('beautifulgirlB (' + i + ').jpg');
-    $('<img>').css('width', width + 'px').css('height', width + 'px').appendTo($('body'));
-  }
-
-  for (var i = 1; i <= 96; i++) {
-    file_names.push('beautifulgirlC (' + i + ').jpg');
-    $('<img>').css('width', width + 'px').css('height', width + 'px').appendTo($('body'));
-  }
-
-  for (var i = 1; i <= 100; i++) {
-    file_names.push('beautifulgirlD (' + i + ').jpg');
-    $('<img>').css('width', width + 'px').css('height', width + 'px').appendTo($('body'));
-  }
-
-  for (var i = 1; i <= 100; i++) {
-    file_names.push('beautifulgirlE (' + i + ').jpg');
-    $('<img>').css('width', width + 'px').css('height', width + 'px').appendTo($('body'));
-  }
-
-  for (var i = 1; i <= 75; i++) {
-    file_names.push('beautifulgirlF (' + i + ').jpg');
-    $('<img>').css('width', width + 'px').css('height', width + 'px').appendTo($('body'));
-  }
+  // for (var i = 1; i <= 100; i++) {
+  //   file_names.push('beautifulgirlB (' + i + ').jpg');
+  //   $('<img>').css('width', width + 'px').css('height', width + 'px').appendTo($('body'));
+  // }
+  //
+  // for (var i = 1; i <= 96; i++) {
+  //   file_names.push('beautifulgirlC (' + i + ').jpg');
+  //   $('<img>').css('width', width + 'px').css('height', width + 'px').appendTo($('body'));
+  // }
+  //
+  // for (var i = 1; i <= 100; i++) {
+  //   file_names.push('beautifulgirlD (' + i + ').jpg');
+  //   $('<img>').css('width', width + 'px').css('height', width + 'px').appendTo($('body'));
+  // }
+  //
+  // for (var i = 1; i <= 100; i++) {
+  //   file_names.push('beautifulgirlE (' + i + ').jpg');
+  //   $('<img>').css('width', width + 'px').css('height', width + 'px').appendTo($('body'));
+  // }
+  //
+  // for (var i = 1; i <= 75; i++) {
+  //   file_names.push('beautifulgirlF (' + i + ').jpg');
+  //   $('<img>').css('width', width + 'px').css('height', width + 'px').appendTo($('body'));
+  // }
 
   file_names.reduce(function(sequence, file_name) {
     return sequence.then(function() {
       return new Promise(function(resolve, reject) {
-        var tx = db.transaction("thumbnail", "readwrite");
-        var store = tx.objectStore("thumbnail");
-        var request = store.get(file_name);
-        request.onsuccess = function() {
-          var matching = request.result;
-          if (matching !== undefined) {
-            resolve(matching.image);
-          } else {
-            reject();
-          }
-        };
-      }).then(function(result) {
-        $('img').eq(index++).attr('src', 'data:image/png;base64,'+result);
-      }).catch(function() {
-        return new Promise(function(resolve, reject) {
-          window.getThumbnail(path + file_name, function(result) {
-            resolve(result);
-          });
-        }).then(function(result) {
-          $('img').eq(index++).attr('src', 'data:image/png;base64,'+result);
-          var tx = db.transaction("thumbnail", "readwrite");
-          var store = tx.objectStore("thumbnail");
-          var request = store.put({name: file_name, image: result});
+        // var tx = db.transaction("thumbnail", "readwrite");
+        // var store = tx.objectStore("thumbnail");
+        // var request = store.get(file_name);
+        // request.onsuccess = function() {
+        //   var matching = request.result;
+        //   if (matching !== undefined) {
+        //     resolve(matching.image);
+        //   } else {
+        //     reject();
+        //   }
+        // };
+
+        window.getThumbnail(path + file_name, function(result) {
+          var img = new Image();
+          img.setAttribute('crossOrigin', 'anonymous');
+          img.onload = function () {
+              var canvas = document.createElement("canvas");
+              canvas.width =this.width;
+              canvas.height =this.height;
+
+              var ctx = canvas.getContext("2d");
+              ctx.drawImage(this, 0, 0);
+
+              var dataURL = canvas.toDataURL("image/png");
+
+              alert(dataURL.replace(/^data:image\/(png|jpg);base64,/, ""));
+          };
+          img.src = 'data:image/png;base64,'+result;
         });
-      });
+
+      })
+      // .then(function(result) {
+      //   $('img').eq(index++).attr('src', 'data:image/png;base64,'+result);
+      // })
+      // .catch(function() {
+      //   return new Promise(function(resolve, reject) {
+      //     window.getThumbnail(path + file_name, function(result) {
+      //       resolve(result);
+      //     });
+      //   }).then(function(result) {
+      //     $('img').eq(index++).attr('src', 'data:image/png;base64,'+result);
+      //     var tx = db.transaction("thumbnail", "readwrite");
+      //     var store = tx.objectStore("thumbnail");
+      //     var request = store.put({name: file_name, image: result});
+      //   });
+      // });
     });
   }, Promise.resolve());
 }
