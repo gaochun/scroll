@@ -44,7 +44,7 @@ app.initialize();
 function init() {
   var path = "/storage/emulated/0/test_pictures/images/"
   var index = 0;
-  var width = screen.width / 3;
+  var width = parseInt(screen.width / 3);
   window.setThumbnailSize(width);
 
   var file_names = [];
@@ -52,70 +52,115 @@ function init() {
   for (var i = 1; i <= 100; i++) {
     file_names.push('beautifulgirlA (' + i + ').jpg');
     //$('<img>').css('width', width + 'px').css('height', width + 'px').appendTo($('body'));
+    $('<canvas>').attr('width', width).attr('height', width).css('width', width + 'px').css('height', width + 'px').appendTo($('body'));
   }
 
-  // for (var i = 1; i <= 100; i++) {
-  //   file_names.push('beautifulgirlB (' + i + ').jpg');
-  //   $('<img>').css('width', width + 'px').css('height', width + 'px').appendTo($('body'));
-  // }
-  //
-  // for (var i = 1; i <= 96; i++) {
-  //   file_names.push('beautifulgirlC (' + i + ').jpg');
-  //   $('<img>').css('width', width + 'px').css('height', width + 'px').appendTo($('body'));
-  // }
-  //
+  for (var i = 1; i <= 100; i++) {
+    file_names.push('beautifulgirlB (' + i + ').jpg');
+    //$('<img>').css('width', width + 'px').css('height', width + 'px').appendTo($('body'));
+    $('<canvas>').attr('width', width).attr('height', width).css('width', width + 'px').css('height', width + 'px').appendTo($('body'));
+  }
+
+  for (var i = 1; i <= 96; i++) {
+    file_names.push('beautifulgirlC (' + i + ').jpg');
+    //$('<img>').css('width', width + 'px').css('height', width + 'px').appendTo($('body'));
+    $('<canvas>').attr('width', width).attr('height', width).css('width', width + 'px').css('height', width + 'px').appendTo($('body'));
+  }
+
+  var showImage = function(i) {
+    var file_name = file_names[i];
+    var tx = db.transaction("thumbnail", "readwrite");
+    var store = tx.objectStore("thumbnail");
+    var request = store.get(file_name);
+    request.onsuccess = function() {
+      var matching = request.result;
+      if (matching !== undefined) {
+        var canvas = $('canvas').eq(i)[0];
+        var ctx = canvas.getContext("2d");
+        var imgdata = new ImageData(matching.image, width, width);
+        ctx.putImageData(imgdata, 0, 0);
+      }
+    };
+  }
+  for (var i = 0; i < file_names.length; i++) {
+    showImage(i);
+  }
+
+  return;
+
   // for (var i = 1; i <= 100; i++) {
   //   file_names.push('beautifulgirlD (' + i + ').jpg');
-  //   $('<img>').css('width', width + 'px').css('height', width + 'px').appendTo($('body'));
+  //   //$('<img>').css('width', width + 'px').css('height', width + 'px').appendTo($('body'));
   // }
   //
   // for (var i = 1; i <= 100; i++) {
   //   file_names.push('beautifulgirlE (' + i + ').jpg');
-  //   $('<img>').css('width', width + 'px').css('height', width + 'px').appendTo($('body'));
+  //   //$('<img>').css('width', width + 'px').css('height', width + 'px').appendTo($('body'));
   // }
   //
   // for (var i = 1; i <= 75; i++) {
   //   file_names.push('beautifulgirlF (' + i + ').jpg');
-  //   $('<img>').css('width', width + 'px').css('height', width + 'px').appendTo($('body'));
+  //   //$('<img>').css('width', width + 'px').css('height', width + 'px').appendTo($('body'));
   // }
 
+  // var height = (file_names.length + 2) / 3 * width;
+  // $('#canvas').attr('width', screen.width).attr('height', height).css("width", screen.width).css("height", height);
+  //
+  // var canvas = document.getElementById('canvas');
+  // var ctx = canvas.getContext("2d");
+
+  var i = 0;
   file_names.reduce(function(sequence, file_name) {
     return sequence.then(function() {
       return new Promise(function(resolve, reject) {
-        // var tx = db.transaction("thumbnail", "readwrite");
-        // var store = tx.objectStore("thumbnail");
-        // var request = store.get(file_name);
-        // request.onsuccess = function() {
-        //   var matching = request.result;
-        //   if (matching !== undefined) {
-        //     resolve(matching.image);
-        //   } else {
-        //     reject();
-        //   }
-        // };
+        var tx = db.transaction("thumbnail", "readwrite");
+        var store = tx.objectStore("thumbnail");
+        var request = store.get(file_name);
+        request.onsuccess = function() {
+          var matching = request.result;
+          if (matching !== undefined) {
+            resolve(matching.image);
+          } else {
+            reject();
+          }
+        };
 
-        window.getThumbnail(path + file_name, function(result) {
-          var img = new Image();
-          img.setAttribute('crossOrigin', 'anonymous');
-          img.onload = function () {
-              var canvas = document.createElement("canvas");
-              canvas.width =this.width;
-              canvas.height =this.height;
-
-              var ctx = canvas.getContext("2d");
-              ctx.drawImage(this, 0, 0);
-
-              var dataURL = canvas.toDataURL("image/png");
-
-              alert(dataURL.replace(/^data:image\/(png|jpg);base64,/, ""));
-          };
-          img.src = 'data:image/png;base64,'+result;
-        });
+        // window.getThumbnail(path + file_name, function(result) {
+        //   var img = new Image();
+        //   img.setAttribute('crossOrigin', 'anonymous');
+        //   img.onload = function () {
+        //       var canvas = $('canvas').eq(index++)[0];
+        //       var ctx = canvas.getContext("2d");
+        //
+        //       ctx.drawImage(this, 0, 0, width, width);
+        //
+        //       var imgd = ctx.getImageData(0, 0, width, width);
+        //       //var blob = new Blob(imgd.data);
+        //
+        //       var tx = db.transaction("thumbnail", "readwrite");
+        //       var store = tx.objectStore("thumbnail");
+        //       var request = store.put({name: file_name, image: imgd.data});
+        //
+        //       //ctx.drawImage(this, parseInt(i % 3) * width, parseInt(i / 3) * width);
+        //
+        //       //var dataURL = canvas.toDataURL("image/png");
+        //       //console.log(dataURL.replace(/^data:image\/(png|jpg);base64,/, ""));
+        //
+        //       i++;
+        //       resolve();
+        //   };
+        //   img.src = 'data:image/png;base64,'+result;
+        //
+        // });
 
       })
-      // .then(function(result) {
-      //   $('img').eq(index++).attr('src', 'data:image/png;base64,'+result);
-      // })
+      .then(function(result) {
+        //$('img').eq(index++).attr('src', 'data:image/png;base64,'+result);
+        var canvas = $('canvas').eq(index++)[0];
+        var ctx = canvas.getContext("2d");
+        var imgdata = new ImageData(result, width, width);
+        ctx.putImageData(imgdata, 0, 0);
+      })
       // .catch(function() {
       //   return new Promise(function(resolve, reject) {
       //     window.getThumbnail(path + file_name, function(result) {
